@@ -48,6 +48,7 @@ module systolic_array_controller #(
   input  logic rst,
   output logic busy,
   output logic done,
+  output logic pe_clear,
   output logic [DATA_WIDTH-1:0] row_stream [0:ARRAY_SIZE-1],
   output logic [DATA_WIDTH-1:0] col_stream [0:ARRAY_SIZE-1],
 
@@ -121,7 +122,7 @@ module systolic_array_controller #(
           next_state = FLUSH;
       end
       FLUSH: begin
-        if (cycle_count == ((2 * active_size) + nnz_k - 3))
+        if (cycle_count >= ((2 * active_size) + nnz_k - 3))
           next_state = DONE;
       end
       DONE: begin
@@ -135,6 +136,7 @@ module systolic_array_controller #(
 
   assign busy = (curr_state != IDLE);
   assign done = (curr_state == DONE);
+  assign pe_clear = (curr_state == SCAN);
 
   // scan_idx: walks k = 0 .. active_size-1 during SCAN
   always_ff @(posedge clk) begin
