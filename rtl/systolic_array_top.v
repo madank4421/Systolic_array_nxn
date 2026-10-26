@@ -29,6 +29,7 @@ module systolic_array_top #(
 
   logic [DATA_WIDTH-1:0] row_stream [0:ARRAY_SIZE-1];
   logic [DATA_WIDTH-1:0] col_stream [0:ARRAY_SIZE-1];
+    logic pe_clear;
 
   systolic_array_controller #(
     .ARRAY_SIZE(ARRAY_SIZE),
@@ -42,6 +43,7 @@ module systolic_array_top #(
     .rst             (rst),
     .busy            (busy),
     .done            (done),
+        .pe_clear        (pe_clear),
     .row_stream      (row_stream),
     .col_stream      (col_stream),
     .nnz_k_count     (nnz_k_count),
@@ -57,6 +59,7 @@ module systolic_array_top #(
     .col_input     (col_stream),
     .clk           (clk),
     .rst           (rst),
+        .clear         (pe_clear),
     .result_matrix (result_matrix)
   );
 
