@@ -5,8 +5,66 @@
 // change because the controller now simply streams a *shorter,
 // compacted* sequence into the same fixed spatial grid.
 
-`include "pe.v"
+//`include "pe.v"
+//`include "/home/vsduser/systolic_array/rtl/pe.v"
 
+module systolic_array #(
+    parameter ARRAY_SIZE = 4,
+    parameter DATA_WIDTH = 8,
+    parameter ACC_WIDTH  = (2 * DATA_WIDTH) + 2
+)(
+    input  [ARRAY_SIZE*DATA_WIDTH-1:0] row_input,
+    input  [ARRAY_SIZE*DATA_WIDTH-1:0] col_input,
+    input  clk,
+    input  rst,
+    input  clear,
+    output [ARRAY_SIZE*ARRAY_SIZE*ACC_WIDTH-1:0] result_matrix
+);
+    wire [DATA_WIDTH-1:0] a_pipe [0:ARRAY_SIZE-1][0:ARRAY_SIZE-1];
+    wire [DATA_WIDTH-1:0] b_pipe [0:ARRAY_SIZE-1][0:ARRAY_SIZE-1];
+    wire [ACC_WIDTH-1:0] result [0:ARRAY_SIZE-1][0:ARRAY_SIZE-1];
+
+    genvar i, j;
+    generate
+        for (i = 0; i < ARRAY_SIZE; i = i + 1) begin: row
+            for (j = 0; j < ARRAY_SIZE; j = j + 1) begin: column
+                wire [DATA_WIDTH-1:0] a_in_w;
+                wire [DATA_WIDTH-1:0] b_in_w;
+
+                if (j == 0) begin: a_edge
+                    assign a_in_w = row_input >> (i * DATA_WIDTH);
+                end else begin: a_int
+                    assign a_in_w = a_pipe[i][j-1];
+                end
+
+                if (i == 0) begin: b_edge
+                    assign b_in_w = col_input >> (j * DATA_WIDTH);
+                end else begin: b_int
+                    assign b_in_w = b_pipe[i-1][j];
+                end
+
+                pe #(
+                    .ARRAY_SIZE(ARRAY_SIZE),
+                    .DATA_WIDTH(DATA_WIDTH),
+                    .ACC_WIDTH(ACC_WIDTH)
+                ) pe_inst (
+                    .a_in(a_in_w),
+                    .b_in(b_in_w),
+                    .clk(clk),
+                    .rst(rst),
+                    .clear(clear),
+                    .a_out(a_pipe[i][j]),
+                    .b_out(b_pipe[i][j]),
+                    .mac_out(result[i][j])
+                );
+
+                // Pack result element (i,j) into the corresponding output slice.
+                assign result_matrix[((i*ARRAY_SIZE+j)*ACC_WIDTH)+ACC_WIDTH-1 : ((i*ARRAY_SIZE+j)*ACC_WIDTH)] = result[i][j];
+            end
+        end
+    endgenerate
+endmodule
+/*
 module systolic_array
   #(parameter ARRAY_SIZE = 4,
     parameter DATA_WIDTH = 8,
@@ -16,6 +74,7 @@ module systolic_array
     input  logic [DATA_WIDTH-1:0] col_input [0:ARRAY_SIZE-1],
     input  logic clk,
     input  logic rst,
+    input  logic clear,
 
     output logic [ACC_WIDTH-1:0] result_matrix [0:ARRAY_SIZE-1][0:ARRAY_SIZE-1]
   );
@@ -29,12 +88,27 @@ module systolic_array
     for (i = 0; i < ARRAY_SIZE; i++) begin : row
       for (j = 0; j < ARRAY_SIZE; j++) begin : column
 
-        pe #(.DATA_WIDTH(DATA_WIDTH), .ACC_WIDTH(ACC_WIDTH))
+        logic [DATA_WIDTH-1:0] a_in_w, b_in_w;
+
+        if (j == 0) begin : a_edge
+          assign a_in_w = row_input[i];
+        end else begin : a_int
+          assign a_in_w = a_pipe[i][j-1];
+        end
+
+        if (i == 0) begin : b_edge
+          assign b_in_w = col_input[j];
+        end else begin : b_int
+          assign b_in_w = b_pipe[i-1][j];
+        end
+
+        pe #(.ARRAY_SIZE(ARRAY_SIZE), .DATA_WIDTH(DATA_WIDTH), .ACC_WIDTH(ACC_WIDTH))
         pe_inst (
-          .a_in    ((j == 0) ? row_input[i]   : a_pipe[i][j-1]),
-          .b_in    ((i == 0) ? col_input[j]   : b_pipe[i-1][j]),
+          .a_in    (a_in_w),
+          .b_in    (b_in_w),
           .clk     (clk),
           .rst     (rst),
+          .clear   (clear),
           .a_out   (a_pipe[i][j]),
           .b_out   (b_pipe[i][j]),
           .mac_out (result_matrix[i][j])
@@ -45,3 +119,5 @@ module systolic_array
   endgenerate
 
 endmodule
+
+*/
