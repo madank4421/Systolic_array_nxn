@@ -11,7 +11,55 @@
 // multiplier dynamic power (visible in your OpenSTA / power reports as
 // lower switching-activity-driven power on the mult cells).
 
+
 module pe #(
+    parameter ARRAY_SIZE = 4,
+    parameter DATA_WIDTH = 8,
+    parameter ACC_WIDTH = (2 * DATA_WIDTH) + $clog2(ARRAY_SIZE)
+)(
+    input  [DATA_WIDTH-1:0] a_in,
+    input  [DATA_WIDTH-1:0] b_in,
+    input  clk,
+    input  rst,
+    input  clear,
+    output reg [DATA_WIDTH-1:0] a_out,
+    output reg [DATA_WIDTH-1:0] b_out,
+    output reg [ACC_WIDTH-1:0] mac_out
+);
+
+    reg mac_enable;
+    wire [DATA_WIDTH-1:0] a_gated;
+    wire [DATA_WIDTH-1:0] b_gated;
+
+    assign mac_enable = (a_in != {DATA_WIDTH{1'b0}}) &&
+                        (b_in != {DATA_WIDTH{1'b0}});
+
+    assign a_gated = mac_enable ? a_in : {DATA_WIDTH{1'b0}};
+    assign b_gated = mac_enable ? b_in : {DATA_WIDTH{1'b0}};
+
+    always @(posedge clk) begin
+        if (rst) begin
+            mac_out <= {ACC_WIDTH{1'b0}};
+            a_out   <= {DATA_WIDTH{1'b0}};
+            b_out   <= {DATA_WIDTH{1'b0}};
+        end
+        else begin
+            a_out <= a_in;
+            b_out <= b_in;
+
+            if (clear)
+                mac_out <= {ACC_WIDTH{1'b0}};
+            else if (mac_enable)
+                mac_out <= mac_out + (a_gated * b_gated);
+        end
+    end
+
+endmodule
+
+
+/*
+module pe #(
+  parameter ARRAY_SIZE = 4,
   parameter DATA_WIDTH = 8,
   parameter ACC_WIDTH  = (2 * DATA_WIDTH) + $clog2(ARRAY_SIZE)
 )
@@ -20,6 +68,7 @@ module pe #(
   input  logic [DATA_WIDTH-1:0] b_in,
   input  logic clk,
   input  logic rst,
+  input  logic clear,
   output logic [DATA_WIDTH-1:0] a_out,
   output logic [DATA_WIDTH-1:0] b_out,
   output logic [ACC_WIDTH-1:0]  mac_out
@@ -40,22 +89,21 @@ module pe #(
   assign a_gated = mac_enable ? a_in : '0;
   assign b_gated = mac_enable ? b_in : '0;
 
-  always_ff @(posedge clk) begin
+   always_ff @(posedge clk) begin
     if (rst) begin
       mac_out <= '0;
       a_out   <= '0;
       b_out   <= '0;
     end
     else begin
-      // Note: a_out/b_out still forward the *original* a_in/b_in, not
-      // the gated versions - downstream PEs need the real streamed
-      // values to run their own zero checks correctly. Only the local
-      // multiply is isolated.
       a_out <= a_in;
       b_out <= b_in;
-      if (mac_enable)
+      if (clear)
+        mac_out <= '0;
+      else if (mac_enable)
         mac_out <= mac_out + (a_gated * b_gated);
     end
   end
 
 endmodule
+*/
