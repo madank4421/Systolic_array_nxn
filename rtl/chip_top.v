@@ -6,16 +6,16 @@ module chip_top (
     wire miso_c, irq_c, busy_c;
 
     // input pads (PAD = bond pad side, C = into the core)
-    PADIN u_clk  (.PAD(clk_pad),  .C(clk_c));
-    PADIN u_rst  (.PAD(rst_pad),  .C(rst_c));
-    PADIN u_sclk (.PAD(sclk_pad), .C(sclk_c));
-    PADIN u_csn  (.PAD(cs_n_pad), .C(cs_n_c));
-    PADIN u_mosi (.PAD(mosi_pad), .C(mosi_c));
+    IPAD20 u_clk  (.IN1(clk_pad),  .OUT1(clk_c));
+    IPAD3U u_rst  (.IN1(rst_pad),  .OUT1(rst_c));
+    IPAD3D u_sclk (.IN1(sclk_pad), .OUT1(sclk_c));
+    IPAD3U u_csn  (.IN1(cs_n_pad), .OUT1(cs_n_c));
+    IPAD30 u_mosi (.IN1(mosi_pad), .OUT1(mosi_c));
 
     // output pads (I = from the core, PAD = bond pad side)
-    PADOUT u_miso (.I(miso_c), .PAD(miso_pad));
-    PADOUT u_irq  (.I(irq_c),  .PAD(irq_pad));
-    PADOUT u_busy (.I(busy_c), .PAD(busy_pad));
+    PAD_OPAD04 u_miso (.IN1(miso_c), .PAD(miso_pad));
+    PAD_OPAD02 u_irq  (.IN1(irq_c),  .PAD(irq_pad));
+    PAD_OPAD02 u_busy (.IN1(busy_c), .PAD(busy_pad));
 
     systolic_chip_top core (
         .clk(clk_c), .rst(rst_c), .sclk(sclk_c), .cs_n(cs_n_c), .mosi(mosi_c),
