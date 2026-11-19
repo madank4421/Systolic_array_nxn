@@ -1,0 +1,58 @@
+This is given in the PDK document : Pad driver (INVR01, INVR02, PDDR02 & PDDR04) for IO Pad should be instantiated in RTL and should be
+placed in outer periphery of core during layout nearer to IO pad.
+
+these are the pad drivers
+INVR01 INVERTER to drive 4Unit Load
+INVR02 INVERTER to drive 8Unit Load
+INVR03 INVERTER to drive 12 Unit Load
+INVR04 INVERTER to drive 16 Unit Load
+INVR05 INVERTER to drive 20 Unit Load
+INVR06 INVERTER to drive 24 Unit Load
+PDDR02 Pad driver (FOR 2 TTL BPAD)
+PDDR04 Pad driver (FOR 4 TTL BPAD)
+
+
+these are the pads
+1.  Bidirectional pad for 2TTL load with CMOS buffer(#) 
+2.  Bi directional pad for 2TTL load with CMOS buff .& 
+pulldown(#) 
+3.  Bi directional pad for 2TTL load with CMOS buff.& pullup(#) 
+4.  Bi directional pad for 2TTL load with CMOS buffer(#) 
+5.  Bi directional pad for 4TTL load with CMOS buff.& 
+pulldown(#) 
+6.  Bi directional pad for 4TTL load with CMOS buff.& pullup(#) 
+7.  Bidirectional pad for 2TTL load with SCHMITT trigger(#) 
+8.  Bi directional pad for 4TTL load with SCHMITT trigger(#) 
+9.  Input pad with buffer for CMOS inputs 
+10.  Input pad with buffer & pulldn for CMOS inputs 
+11.  Input pad with buffer& pullup for CMOS inputs 
+12.  Input pad with Schmitt triggers 
+13.  Input pad with Schmitt triggers & pulldn 
+14.  Input pad with Schmitt triggers &pullup 
+15.  Output pad for 2TTL load 
+16.  Output pad for 4TTL load 
+17.  VDD(Power) Pad 
+18.  VSS(Ground)Pad,Type1
+
+these are the pads i used in my design
+Signal	Pad type from your list	Why
+clk	9: Input pad, CMOS buffer	Lowest delay for a clean clock from the STM. Use 12 (Schmitt) if the wire is long or noisy.
+rst	14: Input pad, Schmitt + pullup	Your reset is active high. A pullup holds the chip in reset while the STM is still booting and its pins float. Schmitt matters because rst asserts asynchronously, so a glitch would reset the whole chip.
+cs_n	14: Input pad, Schmitt + pullup	Floating pins at STM boot leave the chip deselected, so noise can’t start a transaction.
+sclk	13: Input pad, Schmitt + pulldown	Mode 0 idles low, and the Schmitt input tolerates ringing on the line.
+mosi	12: Input pad, Schmitt	No default level needed.
+miso	15: Output pad, 2TTL (or 16, 4TTL)	Use 16 if the trace to the STM is long or the load is heavy.
+irq	15: Output pad, 2TTL	Drives a GPIO or LED.
+busy	15: Output pad, 2TTL	Same as irq.
+supplies	17: VDD pad, 18: VSS pad	Details below.
+
+
+
+
+
+
+
+
+
+
+now thequestion is, if i should use pad drivers are not
