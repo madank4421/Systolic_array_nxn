@@ -1,7 +1,7 @@
 // systolic_chip_top.v
 //
-// Chip-level wrapper: SPI slave + register bank around the unchanged
-// systolic_array_top. Only 8 signal pins instead of ~560.
+// Chip-level wrapper: SPI slave + register bank around systolic_array_top.
+// Only 8 signal pins.
 //
 //   clk   : core clock (must be >= 8x sclk)
 //   rst   : external reset, active high. Asserted asynchronously, released
@@ -10,8 +10,8 @@
 //   irq   : high when a run has completed (sticky, cleared by next start)
 //   busy  : high while a run is in progress
 //
-// miso is driven to 0 when cs_n is high. If several slaves share the MISO
-// line, put a tri-state pad on it (enable = ~cs_n) at pad-ring level.
+// Change vs. previous version: DATA_WIDTH is now 4 (ACC_WIDTH = 10).
+// spi_slave.v is unchanged.
 
 `include "spi_slave.v"
 `include "reg_bank.v"
@@ -28,7 +28,7 @@ module systolic_chip_top (
     output wire busy
 );
     localparam ARRAY_SIZE = 4;
-    localparam DATA_WIDTH = 8;
+    localparam DATA_WIDTH = 4;
     localparam ACC_WIDTH  = (2 * DATA_WIDTH) + 2;
     localparam CNT_W      = 3;      // $clog2(ARRAY_SIZE+1)
 
