@@ -1,0 +1,53 @@
+FLATTENED:
+
+23. Printing statistics.
+
+=== systolic_chip_top ===
+
+        +----------Local Count, excluding submodules.
+        |        +-Local Area, excluding submodules.
+        |        | 
+    12240        - wires
+    16149        - wire bits
+      250        - public wires
+     4042        - public wire bits
+        8        - ports
+        8        - port bits
+    12021 2.83E+04 cells
+       21        -   $scopeinfo
+     1244     2488   ADNR01
+       26   112.58   ADOR16
+      479      958   AND201
+      137   365.79   AND301
+       36      108   AND401
+       16    53.28   AND501
+      121   444.07   AOI401
+      815  5436.05   DFFL11
+        2     16.8   DFPR11
+      515      515   INVR01
+      177   635.43   MX201B
+      806  2087.54   MX2101
+        7    67.69   MX4122
+     1512  2010.96   NND201
+      499      998   NND300
+        9    33.03   NND401
+        4       16   NND501
+     2169  2884.77   NOR200
+      508   848.36   NOR300
+        4    14.68   NOR401
+        6       24   NOR501
+       35   151.55   NOR601
+      254   424.18   OR2101
+       65   151.45   OR3101
+      114   304.38   OR4101
+        1     4.67   OR5101
+      582  1356.06   ORND01
+     1119     3357   XNR201
+      738  2457.54   XOR201
+
+   Area for cell type $scopeinfo is unknown!
+
+   Chip area for module '\systolic_chip_top': 28324.860000
+     of which used for sequential elements: 5452.850000 (19.25%)
+
+     
