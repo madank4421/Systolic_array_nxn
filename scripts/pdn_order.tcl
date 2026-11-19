@@ -6,6 +6,9 @@ read_lef /home/scl/my_dtech/sclc1d/digital_c1d/lef/corner.lef
 
 read_def /home/scl/EDA/openlane/OpenLane/OpenLane/designs/check_stdcells/runs/RUN_check/results/floorplan/RO.def
 
+
+set_dont_touch [get_cells u_drv_*]   ;# right after the DEF is read
+
 make_io_sites \
 -horizontal_site IO \
 -vertical_site IO \
