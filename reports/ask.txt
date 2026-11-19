@@ -41,10 +41,18 @@ rst	14: Input pad, Schmitt + pullup	Your reset is active high. A pullup holds th
 cs_n	14: Input pad, Schmitt + pullup	Floating pins at STM boot leave the chip deselected, so noise can’t start a transaction.
 sclk	13: Input pad, Schmitt + pulldown	Mode 0 idles low, and the Schmitt input tolerates ringing on the line.
 mosi	12: Input pad, Schmitt	No default level needed.
+
+
 miso	15: Output pad, 2TTL (or 16, 4TTL)	Use 16 if the trace to the STM is long or the load is heavy.
 irq	15: Output pad, 2TTL	Drives a GPIO or LED.
 busy	15: Output pad, 2TTL	Same as irq.
 supplies	17: VDD pad, 18: VSS pad	Details below.
+
+
+Signal	Pad	Driver	Why
+miso	OPAD04 (4TTL)	INVR02	It’s the only fast signal, and a jump wire adds capacitance, inductance and ringing. The stronger pad gives margin.
+irq	OPAD02 (2TTL)	INVR01	Slow signal into an STM GPIO, so the smaller pad is enough.
+busy	OPAD02 (2TTL)	INVR01	Same as irq.
 
 
 
