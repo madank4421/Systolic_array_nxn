@@ -1,24 +1,25 @@
 module chip_top (
-    input  clk_pad, rst_pad, sclk_pad, cs_n_pad, mosi_pad,
-    output miso_pad, irq_pad, busy_pad
+    input  wire clk,
+    input  wire rst,
+    input  wire cs_n,
+    input  wire sclk,
+    input  wire mosi,
+    output wire miso_to_pad,   // goes to OPAD04 input in the frame
+    output wire irq_to_pad,    // goes to OPAD02 input in the frame
+    output wire busy_to_pad    // goes to OPAD02 input in the frame
 );
-    wire clk_c, rst_c, sclk_c, cs_n_c, mosi_c;
-    wire miso_c, irq_c, busy_c;
 
-    // input pads (PAD = bond pad side, C = into the core)
-    IPAD20 u_clk  (.IN1(clk_pad),  .OUT1(clk_c));
-    IPAD3U u_rst  (.IN1(rst_pad),  .OUT1(rst_c));
-    IPAD3D u_sclk (.IN1(sclk_pad), .OUT1(sclk_c));
-    IPAD3U u_csn  (.IN1(cs_n_pad), .OUT1(cs_n_c));
-    IPAD30 u_mosi (.IN1(mosi_pad), .OUT1(mosi_c));
+    wire miso_core, irq_core, busy_core;
 
-    // output pads (I = from the core, PAD = bond pad side)
-    PAD_OPAD04 u_miso (.IN1(miso_c), .PAD(miso_pad));
-    PAD_OPAD02 u_irq  (.IN1(irq_c),  .PAD(irq_pad));
-    PAD_OPAD02 u_busy (.IN1(busy_c), .PAD(busy_pad));
-
-    systolic_chip_top core (
-        .clk(clk_c), .rst(rst_c), .sclk(sclk_c), .cs_n(cs_n_c), .mosi(mosi_c),
-        .miso(miso_c), .irq(irq_c), .busy(busy_c)
+    // your design
+    spi_core u_core (
+        .clk(clk), .rst(rst), .cs_n(cs_n), .sclk(sclk), .mosi(mosi),
+        .miso(miso_core), .irq(irq_core), .busy(busy_core)
     );
+
+    // pad drivers
+    INVR02 u_drv_miso (.I(miso_core), .ZN(miso_to_pad));   // for OPAD04
+    INVR01 u_drv_irq  (.I(irq_core),  .ZN(irq_to_pad));    // for OPAD02
+    INVR01 u_drv_busy (.I(busy_core), .ZN(busy_to_pad));   // for OPAD02
+
 endmodule
