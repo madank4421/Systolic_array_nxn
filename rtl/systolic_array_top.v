@@ -1,14 +1,13 @@
 // systolic_array_top.v
-// Same structure as your original top; just forwards the two new
-// debug/reporting outputs from the controller so a testbench can log
-// how many k-slices were skipped per run.
+// External ports unchanged. Internally, the controller's acc_clear output is
+// wired to the array's clear input.
 
 `include "systolic_array_controller.v"
 `include "systolic_array.v"
 
 module systolic_array_top #(
   parameter ARRAY_SIZE = 4,
-  parameter DATA_WIDTH = 8,
+  parameter DATA_WIDTH = 4,
   parameter ACC_WIDTH  = (2 * DATA_WIDTH) + $clog2(ARRAY_SIZE)
 )(
   input  logic [DATA_WIDTH-1:0] matrix_a [0:ARRAY_SIZE-1][0:ARRAY_SIZE-1],
@@ -21,14 +20,13 @@ module systolic_array_top #(
   output logic done,
   output logic [ACC_WIDTH-1:0] result_matrix [0:ARRAY_SIZE-1][0:ARRAY_SIZE-1],
 
-  // Sparsity reporting: read these after `done` goes high to log how
-  // much streaming work was skipped for that particular input pair.
   output logic [$clog2(ARRAY_SIZE + 1)-1:0] nnz_k_count,
   output logic [$clog2(ARRAY_SIZE + 1)-1:0] skipped_k_count
 );
 
   logic [DATA_WIDTH-1:0] row_stream [0:ARRAY_SIZE-1];
   logic [DATA_WIDTH-1:0] col_stream [0:ARRAY_SIZE-1];
+  logic acc_clear;
 
   systolic_array_controller #(
     .ARRAY_SIZE(ARRAY_SIZE),
@@ -44,6 +42,7 @@ module systolic_array_top #(
     .done            (done),
     .row_stream      (row_stream),
     .col_stream      (col_stream),
+    .acc_clear       (acc_clear),
     .nnz_k_count     (nnz_k_count),
     .skipped_k_count (skipped_k_count)
   );
@@ -57,6 +56,7 @@ module systolic_array_top #(
     .col_input     (col_stream),
     .clk           (clk),
     .rst           (rst),
+    .clear         (acc_clear),
     .result_matrix (result_matrix)
   );
 
