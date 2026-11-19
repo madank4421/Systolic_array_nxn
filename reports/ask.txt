@@ -55,6 +55,21 @@ irq	OPAD02 (2TTL)	INVR01	Slow signal into an STM GPIO, so the smaller pad is eno
 busy	OPAD02 (2TTL)	INVR01	Same as irq.
 
 
+========================
+
+Pad assignment for all signals
+Signal	Direction	Pad	Driver cell	Reason
+clk	Input	12: Input, Schmitt	None	The Schmitt trigger cleans up slow or ringing edges from jump wires.
+rst	Input	14: Input, Schmitt + pullup	None	Active high, so the pullup holds the chip in reset while the STM boots and its pins float. The Schmitt input rejects glitches on an asynchronous reset.
+cs_n	Input	14: Input, Schmitt + pullup	None	Active low, so a floating pin leaves the chip deselected.
+sclk	Input	13: Input, Schmitt + pulldown	None	Mode 0 idles low, so the pulldown gives a defined idle level.
+mosi	Input	12: Input, Schmitt	None	No default level is needed, and the Schmitt input tolerates ringing.
+miso	Output	16: OPAD04 (4TTL, inverting)	INVR02	The fastest output and the one most affected by wire capacitance.
+irq	Output	15: OPAD02 (2TTL, inverting)	INVR01	Slow signal into an STM GPIO.
+busy	Output	15: OPAD02 (2TTL, inverting)	INVR01	Same as irq.
+VDD	Power	17: VDD pad	None	Supplies the core and the pad ring.
+VSS	Power	18: VSS pad, Type 1	None	Ground return.
+
 
 
 
