@@ -18,8 +18,8 @@ module chip_top (
     );
 
     // pad drivers
-    INVR02 u_drv_miso (.I(miso_core), .ZN(miso_to_pad));   // for OPAD04
-    INVR01 u_drv_irq  (.I(irq_core),  .ZN(irq_to_pad));    // for OPAD02
-    INVR01 u_drv_busy (.I(busy_core), .ZN(busy_to_pad));   // for OPAD02
+    INVR02 u_drv_miso (.IN1(miso_core), .OUT1(miso_to_pad));   // for OPAD04
+    INVR01 u_drv_irq  (.IN1(irq_core),  .OUT1(irq_to_pad));    // for OPAD02
+    INVR01 u_drv_busy (.IN1(busy_core), .OUT1(busy_to_pad));   // for OPAD02
 
 endmodule
